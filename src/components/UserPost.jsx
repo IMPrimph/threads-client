@@ -8,7 +8,7 @@ import { useState } from 'react'
 const UserPost = ({ likes, replies, postTitle, postImg }) => {
     const [liked, setLiked] = useState(false)
   return (
-    <Link to={'primph/post/1'}>
+    <Link to={'/primph/post/1'}>
         <Flex gap={3} mb={4} py={5}>
             <Flex flexDirection={'column'} alignItems={'center'}>
                 <Avatar size='md' name='primph' src='/zuck-avatar.png' />
