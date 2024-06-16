@@ -18,7 +18,6 @@ const LogoutButton = () => {
       })
 
       const data = await res.json();
-      console.log(data)
 
       if (data.error) {
         toast('Error', data.error, 'error');
