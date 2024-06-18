@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
 import UserHeader from '../components/UserHeader'
-import UserPost from '../components/UserPost'
 import { useParams } from 'react-router-dom';
 import showToast from '../hooks/showToast';
 import { Flex, Spinner } from '@chakra-ui/react';
+import Post from '../components/Post';
 
 const UserPage = () => {
   const [user, setUser] = useState(null);
   const { username } = useParams();
   const toast = showToast()
   const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
+  const [fetchingPosts, setFetchingPosts] = useState(true);
 
   useEffect(() => {
     const getUser = async() => {
@@ -29,7 +31,28 @@ const UserPage = () => {
       }
     }
 
+    const getPosts = async() => {
+      setFetchingPosts(true);
+      try {
+        const res = await fetch(`/api/posts/user/${username}`);
+        const data = await res.json();
+
+        if (data.error) {
+          toast('Error', data.error, 'error')
+          return;
+        }
+
+        setPosts(data);
+      } catch (error) {
+        toast('Error', error, 'error')
+        setPosts([]);
+      } finally {
+        setFetchingPosts(false);
+      }
+    }
+
     getUser();
+    getPosts();
   }, [username, toast])
 
   if (!user && loading) {
@@ -47,9 +70,18 @@ const UserPage = () => {
   return (
     <>
       <UserHeader user={user} />
-      <UserPost likes={1200} replies={488} postImg='/post1.png' postTitle='Talk about threads' />
-      <UserPost likes={200} replies={3} postImg='/post2.png' postTitle='Talk about insta' />
-      <UserPost likes={45} replies={4} postImg='/post3.png' postTitle='Bye bye' />
+
+      {!fetchingPosts && posts.length === 0 && <h1>User has not posts</h1>}
+
+      {fetchingPosts && (
+        <Flex justifyContent={'center'} my={12}>
+          <Spinner size={'xl'} />
+        </Flex>
+      )}
+
+      {posts.map((post) => (
+        <Post post={post} key={post._id} postedBy={post.postedBy} />
+      ))}
     </>
   )
 }

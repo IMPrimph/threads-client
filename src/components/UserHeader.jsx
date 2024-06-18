@@ -10,7 +10,7 @@ import { useState } from "react"
 const UserHeader = ({ user }) => {
   const toast = showToast()
   const currentUser = useRecoilValue(userAtom);
-  const [following, setFollowing] = useState(user.followers.includes(currentUser._id))
+  const [following, setFollowing] = useState(user?.followers?.includes(currentUser?._id))
   const [updating, setUpdating] = useState(false);
 
   const copyURL = () => {
@@ -104,19 +104,19 @@ const UserHeader = ({ user }) => {
       </Flex>
       <Text>{user.bio}</Text>
 
-      {currentUser._id === user._id && (
+      {currentUser?._id === user._id && (
         <Link as={RouterLink} to="/update">
           <Button size={'sm'}>Update Profile</Button>
         </Link>
       )}
 
-      {currentUser._id !== user._id && (
+      {currentUser && currentUser?._id !== user._id && (
         <Button isLoading={updating} onClick={handleFollowUnFollow} size={'sm'}>{ following ? 'UnFollow' :  'Follow'}</Button>
       )}
 
       <Flex w={'full'} justifyContent={'space-between'}>
         <Flex gap={2} alignItems={'center'}>
-          <Text color={'gray.light'}>{user.followers.length} followers</Text>
+          <Text color={'gray.light'}>{user?.followers?.length} followers</Text>
           <Box w='1' h='1' bg={'gray.light'} borderRadius={'full'}></Box>
           <Link color={'gray.light'}>instagram.com</Link>
         </Flex>

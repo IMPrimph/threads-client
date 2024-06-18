@@ -7,7 +7,6 @@ import showToast from "../hooks/showToast";
 import { formatDistanceToNow } from "date-fns";
 
 const Post = ({ post, postedBy }) => {
-  const [liked, setLiked] = useState(false);
   const toast = showToast();
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -120,16 +119,7 @@ const Post = ({ post, postedBy }) => {
             </Box>
           )}
           <Flex gap="3" my="1">
-            <Actions liked={liked} setLiked={setLiked} />
-          </Flex>
-          <Flex gap={2} alignItems={"center"}>
-            <Text color={"gray.light"} fontSize={"small"}>
-              {post.replies.length} replies
-            </Text>
-            <Box w={0.5} h={0.5} borderRadius={"full"} bg={"gray.light"}></Box>
-            <Text color={"gray.light"} fontSize={"small"}>
-              {post.likes.length} likes
-            </Text>
+            <Actions post={post} />
           </Flex>
         </Flex>
       </Flex>
