@@ -17,16 +17,17 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import showToast from "../hooks/showToast";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userAtom } from "../atoms/userAtom";
+import { postsAtom } from "../atoms/postsAtom";
 
-const Actions = ({ post: _post }) => {
+const Actions = ({ post }) => {
     const user = useRecoilValue(userAtom);
-    const [liked, setLiked] = useState(_post?.likes.includes(user?._id));
-    const [post, setPost] = useState(_post);
+    const [liked, setLiked] = useState(post?.likes.includes(user?._id));
     const [isLiking, setIsLiking] = useState(false);
     const [replying, setReplying] = useState(false);
     const [reply, setReply] = useState('');
+    const [posts, setPosts] = useRecoilState(postsAtom);
 
     const toast = showToast();
 
@@ -54,10 +55,28 @@ const Actions = ({ post: _post }) => {
 
             if (!liked) {
                 // add the id of current user to post.likes array
-                setPost({ ...post, likes: [...post.likes, user._id] })
+                const updatedPosts = posts.map((p) => {
+                    if (p._id === post._id) {
+                        return {
+                           ...p,
+                            likes: [...p.likes, user._id]
+                        }
+                    }
+                    return p;
+                });
+                setPosts(updatedPosts);
             } else {
                 // remove the id of current user from post.likes array
-                setPost({ ...post, likes: post.likes.filter(id => id !== user._id) })
+                const updatedPosts = posts.map((p) => {
+                    if (p._id === post._id) {
+                        return {
+                           ...p,
+                            likes: p.likes.filter((id) => id!== user._id)
+                        }
+                    }
+                    return p;
+                });
+                setPosts(updatedPosts);
             }
 
             setLiked(!liked);
@@ -94,7 +113,17 @@ const Actions = ({ post: _post }) => {
                 return;
             }
 
-            setPost({...post, replies: [...post.replies, data.reply] });
+            const updatedPosts = posts.map((p) => {
+                if (p._id === post._id) {
+                    return {
+                       ...p,
+                        replies: [...p.replies, data]
+                    }
+                }
+                return p;
+            });
+            setPosts(updatedPosts);
+
             setReply('');
             onClose();
         } catch (error) {
