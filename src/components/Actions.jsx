@@ -93,7 +93,7 @@ const Actions = ({ post: _post }) => {
                 toast('Error', data.error, 'error');
                 return;
             }
-            console.log(data);
+
             setPost({...post, replies: [...post.replies, data.reply] });
             setReply('');
             onClose();
