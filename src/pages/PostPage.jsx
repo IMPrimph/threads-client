@@ -1,47 +1,100 @@
-import { Avatar, Box, Button, Divider, Flex, Image, Text } from "@chakra-ui/react"
-import { BsThreeDots } from "react-icons/bs"
+import { Avatar, Box, Button, Divider, Flex, Image, Spinner, Text } from "@chakra-ui/react"
 import Actions from "../components/Actions"
-import { useState } from "react"
-import Comment from "../components/Comment"
+import getUserProfile from "../hooks/getUserProfile"
+import { useEffect, useState } from "react"
+import showToast from "../hooks/showToast"
+import { useNavigate, useParams } from "react-router-dom"
+import { formatDistanceToNow } from "date-fns"
+import { DeleteIcon } from "@chakra-ui/icons"
+import { useRecoilValue } from "recoil"
+import { userAtom } from "../atoms/userAtom"
+import deletePost from "../hooks/deletePost"
 
 const PostPage = () => {
-  const [liked, setLiked] = useState(false);
+  const { user, loading } = getUserProfile();
+  const [post, setPost] = useState(null);
+  const toast = showToast();
+  const { pid } = useParams();
+  const currentUser = useRecoilValue(userAtom);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getPost = async () => {
+      try {
+        const res = await fetch(`/api/posts/${pid}`);
+        const data = await res.json();
+
+        if (data.error) {
+          toast('Error', data.error, 'error')
+          return;
+        }
+
+        setPost(data);
+      } catch (error) {
+        toast('Error', error, 'error')
+        setPost({});
+      }
+    };
+
+    getPost();
+  }, [pid, toast]);
+
+
+  if (!user && loading) {
+    return(
+      <Flex justifyContent={'center'}>
+        <Spinner size={'xl'} />
+      </Flex>
+    )
+  }
+
+  const handleDeletePost = async () => {
+    await deletePost(post, toast);
+    navigate(`/${user.username}`);
+  }
+
+  if (!post) return null;
 
   return (
     <>
       <Flex>
         <Flex w={'full'} alignItems={'center'} gap={3}>
-          <Avatar src='/zuck-avatar.png' size={'md'} name='primph'/>
+          <Avatar src={user.profilePic} size={'md'} name='primph'/>
           <Flex>
-            <Text fontSize={'small'} fontWeight={'bold'}>primph</Text>
+            <Text fontSize={'small'} fontWeight={'bold'}>{user.username}</Text>
             <Image src="/verified.png" w={4} h={4} ml={4} />
           </Flex>
         </Flex>
         <Flex gap={4} alignItems={'center'}>
-          <Text fontSize={'small'} color={'gray.light'}>1d</Text>
-          <BsThreeDots cursor={'pointer'} />
+        <Flex gap={4} alignItems={"center"}>
+          <Text fontSize={"small"} width={36} textAlign={'right'} color={"gray.light"}>
+            {formatDistanceToNow(new Date(post.createdAt))} ago
+          </Text>
+
+          {currentUser?._id === user._id && (
+            <DeleteIcon cursor={'pointer'} onClick={handleDeletePost} size={20} />
+          )}
+        </Flex>
         </Flex>
       </Flex>
 
-      <Text my='3'>about threads</Text>
-      <Box
-        borderRadius={6}
-        overflow={'hidden'}
-        border={'1px solid'}
-        borderColor={'gray.light'}
-      >
-        <Image src='/post1.png' w={'full'} />
-      </Box>
+      <Text my='3'>{post.text}</Text>
+
+      {post.img && (
+        <Box
+          borderRadius={6}
+          overflow={'hidden'}
+          border={'1px solid'}
+          borderColor={'gray.light'}
+        >
+          <Image src={post.img} w={'full'} />
+        </Box>
+      )}
 
       <Flex gap={3} my={3}>
-        <Actions liked={liked} setLiked={setLiked} />
+        <Actions post={post} />
       </Flex>
 
-      <Flex gap={2} alignItems={'center'}>
-        <Text color={'gray.light'} fontSize={'small'}>23 replies</Text>
-        <Box w={0.5} borderRadius={'full'} bg={'gray.light'}></Box>
-        <Text color={'gray.light'} fontSize={'small'}>{ 20 + (liked ? 1 : 0) } likes</Text>
-      </Flex>
       <Divider my={4} />
 
       <Flex justifyContent={'space-between'}>
@@ -52,27 +105,13 @@ const PostPage = () => {
         <Button>Get</Button>
       </Flex>
       <Divider my={4} />
-      <Comment
+      {/* <Comment
         comment='comment 1'
         createdAt='2d'
         likes={10}
         username='dan'
         userAvatar='https://bit.ly/dan-abramov'
-      />
-      <Comment
-        comment='comment 2'
-        createdAt='3d'
-        likes={50}
-        username='kola'
-        userAvatar='https://bit.ly/kent-c-dodds'
-      />
-      <Comment
-        comment='comment 3'
-        createdAt='5d'
-        likes={90}
-        username='Prosper'
-        userAvatar='https://bit.ly/prosper-baba'
-      />
+      /> */}
     </>
   )
 }

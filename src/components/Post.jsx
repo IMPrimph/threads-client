@@ -128,6 +128,7 @@ const Post = ({ post, postedBy }) => {
               </Text>
               <Image src="/verified.png" w="4" h="4" ml="1" />
             </Flex>
+
             <Flex gap={4} alignItems={"center"}>
               <Text fontSize={"small"} width={36} textAlign={'right'} color={"gray.light"}>
                 {formatDistanceToNow(new Date(post.createdAt))} ago
