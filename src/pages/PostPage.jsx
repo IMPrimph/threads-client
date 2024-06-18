@@ -9,6 +9,7 @@ import { DeleteIcon } from "@chakra-ui/icons"
 import { useRecoilValue } from "recoil"
 import { userAtom } from "../atoms/userAtom"
 import deletePost from "../hooks/deletePost"
+import Comment from "../components/Comment"
 
 const PostPage = () => {
   const { user, loading } = getUserProfile();
@@ -105,13 +106,14 @@ const PostPage = () => {
         <Button>Get</Button>
       </Flex>
       <Divider my={4} />
-      {/* <Comment
-        comment='comment 1'
-        createdAt='2d'
-        likes={10}
-        username='dan'
-        userAvatar='https://bit.ly/dan-abramov'
-      /> */}
+
+      {post.replies.map((reply) => (
+        <Comment
+          key={reply._id}
+          reply={reply}
+          lastReply={reply._id === post.replies[post.replies.length - 1]._id}
+        />
+      ))}
     </>
   )
 }
