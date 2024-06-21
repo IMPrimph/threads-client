@@ -26,6 +26,7 @@ const Conversations = ({ conversation }) => {
                 userId: user._id,
                 username: user.username,
                 userProfilePic: user.profilePic,
+                mock: conversation?.mock
             })}
             borderRadius={'md'}
             bg={selectedConversation._id === conversation._id ? (colorMode === 'light' ? 'gray.400' : 'gray.dark') : ''}
