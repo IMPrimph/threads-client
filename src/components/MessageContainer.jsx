@@ -42,7 +42,28 @@ const MessageContainer = () => {
 			});
         });
         return () => socket.off('newMessage');
-    }, [socket, selectedConversation, setConversations])
+    }, [socket, selectedConversation, setConversations]);
+
+    useEffect(() => {
+        const lastMessageIsFromOtherUser = messages.length && messages[messages.length - 1].sender !== currentUser._id;
+
+        if (lastMessageIsFromOtherUser) {
+            socket.emit('markMessageAsSeen', {
+                conversationId: selectedConversation._id,
+                userId: selectedConversation.userId,
+            });
+        }
+
+        socket.on('messageSeen', ({ conversationId }) => {
+            if (conversationId === selectedConversation._id) {
+                setMessages((prevMessages) => prevMessages.map((message) => ({
+                   ...message,
+                    seen: true
+                })))
+            }
+        })
+
+    }, [currentUser._id, socket, messages, selectedConversation]);
 
     useEffect(() => {
         const getMessages = async () => {
@@ -73,7 +94,7 @@ const MessageContainer = () => {
 
     useEffect(() => {
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages])
+    }, [messages]);
 
     return (
         <Flex
