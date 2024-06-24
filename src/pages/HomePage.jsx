@@ -1,9 +1,10 @@
-import { Flex, Spinner } from "@chakra-ui/react"
+import { Box, Flex, Spinner } from "@chakra-ui/react"
 import showToast from "../hooks/showToast"
 import { useEffect, useState } from "react";
 import Post from '../components/Post'
 import { useRecoilState } from "recoil";
 import { postsAtom } from "../atoms/postsAtom";
+import SuggestedUsers from "../components/SuggestedUsers";
 
 const HomePage = () => {
   const toast = showToast();
@@ -11,7 +12,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getFeedPosts = async() => {
+    const getFeedPosts = async () => {
       setPosts([]);
       setLoading(true);
       try {
@@ -36,19 +37,31 @@ const HomePage = () => {
   }, [toast, setPosts]);
 
   return (
-    <>
-      {!loading && posts.length === 0 && <h1>Follow Some Users to see the posts</h1>}
+    <Flex gap={10} alignItems={'flex-start'}>
+      <Box flex={70}>
+        {!loading && posts.length === 0 && <h1>Follow Some Users to see the posts</h1>}
 
-      {loading && (
-        <Flex justify={'center'}>
-          <Spinner size={'xl'} />
-        </Flex>
-      )}
+        {loading && (
+          <Flex justify={'center'}>
+            <Spinner size={'xl'} />
+          </Flex>
+        )}
 
-      {posts.map((post) => (
-        <Post key={post._id} post={post} postedBy={post.postedBy} />
-      ))}
-    </>
+        {posts.map((post) => (
+          <Post key={post._id} post={post} postedBy={post.postedBy} />
+        ))}
+      </Box>
+
+      <Box
+        flex={30}
+        display={{
+          base: 'none',
+          md: 'block'
+        }}
+      >
+        <SuggestedUsers/>
+      </Box>
+    </Flex>
   )
 }
 
