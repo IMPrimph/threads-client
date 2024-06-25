@@ -97,7 +97,7 @@ const ChatPage = () => {
             const mockConversation = {
                 mock: true,
                 lastMessage: {
-                    test: '',
+                    text: '',
                     sender: ''
                 },
                 _id: Date.now(),
